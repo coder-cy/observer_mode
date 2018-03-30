@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>demo</title>
+</head>
+<body>
+    <h3 id="h3">hahaha</h3>
+    <h4 id="h4">lalala</h4>
+    <h5 id="h5">wawawa</h4>
+</body>
+<script type="text/javascript">
+/* on要先于 */
+class Bus {
+	constructor() {
+		this.eventObj = {};
+	};
+
+	emit(event, data) {
+		if(!this.eventObj[event]) {
+			console.warn('Maybe you have offed event, or you call "on" after "emit"')
+			return;
+		}
+		let callBackList = this.eventObj[event];
+		callBackList.forEach(callBack => {
+			if(data) {
+				callBack(data)
+			}
+			else {
+				callBack();
+			}
+		})
+	};
+
+	on(event, callBack) {
+		if(!this.eventObj[event]) {
+			this.eventObj[event] = [];
+		}
+		this.eventObj[event].push(callBack);
+	};
+
+	off(event, callBack) {
+		let callBackList = this.eventObj[event];
+		if(!callBackList) {
+			return;
+		}
+		if(!callBack) {
+			delete this.eventObj[event];
+		}
+		else {
+			callBackList.forEach((_callBack,i) => {
+                if(callBack === _callBack){
+                    callBackList.splice(i, 1);
+                }				
+			})
+		}
+	};
+
+}
+
+const bus = new Bus();
+
+var a = 0;
+
+h3.addEventListener('click', () => {
+	bus.emit('TURN_GREEN', 'green');
+	bus.emit('TURN_RED', 'red');
+	a++;
+	bus.emit('ADD', a)
+})
+
+bus.on('TURN_GREEN', (data) => {
+	h4.style.background = data;
+})
+
+bus.on('TURN_RED', (data) => {
+	h5.style.background = data;
+})
+bus.on('ADD', (data) => {
+	h5.innerHTML = data
+})
+
+setTimeout(() => {
+	bus.off('ADD')
+}, 3000)
+
+
+bus.emit('ALERT');
+bus.on('ALERT',() => {
+	alert('hahaha')
+});
+</script>
+</html>
+
+
+
+
